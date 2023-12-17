@@ -1,0 +1,18 @@
+@startuml database
+object mix {
+    id : long
+    owner : django_user
+    name : char(200)
+    upload_time : timestamp
+    filepath : char(200) 
+    length_in_sec : int
+}
+
+object django_user {
+    name : varchar
+    ...
+}
+
+mix -> django_user
+
+@enduml
