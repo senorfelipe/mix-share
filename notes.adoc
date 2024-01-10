@@ -1,0 +1,18 @@
+# Mix Share Dev Notes
+
+## TODOs
+
+### Mixes
+* [x] check how to set length_in_sec before serializing
+* [x] add delete endpoint for mixes
+* [ ] add Router for Api
+
+### User Profile
+* [ ] create model for UserProfile
+- name (unique)
+- picture (optional)
+- Location (optional)
+- about the artist (optional)
+- tags (optional)
+
+* [ ] create API to create, update, delete, list User Profile

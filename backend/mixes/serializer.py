@@ -10,13 +10,13 @@ class MixSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mix
         fields = [
-            "name",
-            "owner",
-            "description",
-            "length_in_sec",
-            "file",
-            "upload_time",
+            'name',
+            'owner',
+            'description',
+            'length_in_sec',
+            'file',
+            'upload_time',
         ]
         read_only_fields = [
-            "lenght_in_sec"
+            'length_in_sec',
         ]

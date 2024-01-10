@@ -16,10 +16,13 @@ Including another URLconf
 """
 from django.urls import include, path
 from rest_framework import routers
+from django.contrib import admin
 
-from mixes.views import MixViewSet
+from mixes.views import ListCreateMix, RetrieveDestroyMix
 
-router = routers.DefaultRouter()
-router.register(r'mix', MixViewSet, basename='mixes')
 
-urlpatterns = [path('', include(router.urls))]
+urlpatterns = [
+    path('mixes/', ListCreateMix.as_view(), name="mixes"),
+    path('mixes/<int:pk>/', RetrieveDestroyMix.as_view(), name="mixe detail"),
+    path('admin/', admin.site.urls),
+]

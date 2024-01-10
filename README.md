@@ -1,2 +1,2 @@
 # mix-share
-A litte website to share dj mixes with friends
+A litte plattform to share dj mixes with friends and give feedback to one another.

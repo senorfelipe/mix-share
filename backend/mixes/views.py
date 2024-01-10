@@ -3,26 +3,29 @@ from mixes import service
 from mixes.serializer import MixSerializer
 from mixes.models import Mix
 from rest_framework import status
-from rest_framework import viewsets
+from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
-class MixViewSet(viewsets.ModelViewSet):
+class ListCreateMix(ListCreateAPIView):
     queryset = Mix.objects.all()
+    parser_classes = (MultiPartParser, FormParser)
     serializer_class = MixSerializer
 
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        uploaded_file = request.FILES.get('file')
 
-    def create(self, request, *args, **kwargs):
-        uploaded_file = request.FILES.get("file")
         if service.is_valid_file(uploaded_file.name):
-            data = request.data
-            lenght_in_sec = service.get_mix_length_in_sec(uploaded_file)
-            data["lenght_in_sec"] = lenght_in_sec
-            serializer = self.serializer_class(data=data)
+            serializer = self.serializer_class(data=request.data)
             if serializer.is_valid():
-                print(f"\n\ndata: \n{serializer.validated_data}\n\n\n")
+                lenght_in_sec = service.get_mix_length_in_sec(uploaded_file)
+                serializer.validated_data['length_in_sec'] = lenght_in_sec
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RetrieveDestroyMix(RetrieveDestroyAPIView):
+    queryset = Mix.objects.all()
+    serializer_class = MixSerializer
