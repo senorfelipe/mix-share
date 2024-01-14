@@ -15,14 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import include, path
-from rest_framework import routers
 from django.contrib import admin
-
-from mixes.views import ListCreateMix, RetrieveDestroyMix
 
 
 urlpatterns = [
-    path('mixes/', ListCreateMix.as_view(), name="mixes"),
-    path('mixes/<int:pk>/', RetrieveDestroyMix.as_view(), name="mixe detail"),
     path('admin/', admin.site.urls),
+    path('api/', include('mixes.urls')),
+    path('api/user/', include('user_api.urls')),
 ]

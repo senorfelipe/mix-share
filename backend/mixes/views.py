@@ -5,12 +5,16 @@ from mixes.models import Mix
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class ListCreateMix(ListCreateAPIView):
     queryset = Mix.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = MixSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
@@ -27,5 +31,7 @@ class ListCreateMix(ListCreateAPIView):
 
 
 class RetrieveDestroyMix(RetrieveDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     queryset = Mix.objects.all()
     serializer_class = MixSerializer

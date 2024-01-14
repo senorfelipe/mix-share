@@ -2,17 +2,34 @@
 
 ## TODOs
 
-### Mixes
+### Backend
+
+#### Mixes
 * [x] check how to set length_in_sec before serializing
 * [x] add delete endpoint for mixes
 * [ ] add Router for Api
 
-### User Profile
-* [ ] create model for UserProfile
-- name (unique)
-- picture (optional)
-- Location (optional)
-- about the artist (optional)
-- tags (optional)
+#### User Profile / Auth
+* [x] create model for UserProfile
+----
+UserProfile
+- fullname (optional)
+- avatar (optional)
+- location (optional) --> check for exisiting Locations
+- bio (optional)
+----
+
+* [x] setup API for JWT based Authentication
+** [ ] test Auth API 
+
+* [ ] check why CustomUser not working, signal to create profile not working
 
 * [ ] create API to create, update, delete, list User Profile
+
+---
+
+### Frontend
+
+* setup react app
+* create basic Auth Component
+* Create Simple Login / Register Page

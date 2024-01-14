@@ -8,6 +8,10 @@ django = "==5.0"
 djangorestframework = "*"
 django-extensions = "*"
 mutagen = "*"
+django-cors-headers = "*"
+djangorestframework-simplejwt = "*"
+pyjwt = "*"
+pillow = "*"
 
 [dev-packages]
 
