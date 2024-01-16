@@ -1,15 +1,18 @@
 from rest_framework import permissions
 from rest_framework.views import APIView
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework_simplejwt import tokens
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 
+from .models import UserProfile
+
 from .serializers import (
     UserLoginSerializer,
+    UserProfileSerializer,
     UserRegistrationSerializer,
 )
 
@@ -20,9 +23,6 @@ UserModel = get_user_model()
 class RegistrationAPIView(APIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
-    authentication_classes = [
-        TokenAuthentication,
-    ]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -32,7 +32,7 @@ class RegistrationAPIView(APIView):
                 refresh = tokens.RefreshToken.for_user(new_user)
                 data = {'access_token': str(refresh.access_token), 'refresh_token': str(refresh)}
                 response = Response(data=data, status=status.HTTP_201_CREATED)
-                response.set_cookie(key='access_token', value=refresh.access_token, httponly=True)
+                # response.set_cookie(key='access_token', value=refresh.access_token, httponly=True)
                 return response
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -40,7 +40,6 @@ class RegistrationAPIView(APIView):
 class LoginAPIView(APIView):
     serializer_class = UserLoginSerializer
     permission_classes = [permissions.AllowAny]
-    authentication_classes = [TokenAuthentication]
 
     def post(self, request, *args, **kwargs):
         email = request.data.get('email', None)
@@ -73,7 +72,6 @@ class LoginAPIView(APIView):
 
 
 class LogoutAPIView(APIView):
-    authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
@@ -85,3 +83,16 @@ class LogoutAPIView(APIView):
             return Response("User logged out successfuly", status=status.HTTP_200_OK)
         except tokens.TokenError:
             raise AuthenticationFailed("Invalid Token")
+
+
+class UserProfileViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    mixins.UpdateModelMixin,
+):
+    # TODO change permission
+    permission_classes = [permissions.AllowAny]
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+

@@ -3,20 +3,24 @@ from mixes import service
 from mixes.serializer import MixSerializer
 from mixes.models import Mix
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView
+from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
-class ListCreateMix(ListCreateAPIView):
+class MixListRetreiveCreateDestroyViewSet(
+    GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+):
     queryset = Mix.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = MixSerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
 
         if service.is_valid_file(uploaded_file.name):
@@ -29,9 +33,12 @@ class ListCreateMix(ListCreateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class RetrieveDestroyMix(RetrieveDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
-    queryset = Mix.objects.all()
-    serializer_class = MixSerializer
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        # only allowed if user is owner
+        return super().destroy(request, *args, **kwargs)

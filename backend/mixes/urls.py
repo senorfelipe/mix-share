@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import include, path
 
-from .views import ListCreateMix, RetrieveDestroyMix
+from .views import MixListRetreiveCreateDestroyViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter(trailing_slash=False)
+
+router.register(r'mixes', MixListRetreiveCreateDestroyViewSet)
 
 urlpatterns = [
-    path('mixes/', ListCreateMix.as_view(), name="mixes"),
-    path('mixes/<int:pk>/', RetrieveDestroyMix.as_view(), name="mixe detail"),
+    path('', include(router.urls)),
 ]

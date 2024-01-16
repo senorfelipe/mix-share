@@ -1,4 +1,5 @@
-# Mix Share Dev Notes
+= Mix Share Dev Notes
+:icons:
 
 ## TODOs
 
@@ -7,7 +8,7 @@
 #### Mixes
 * [x] check how to set length_in_sec before serializing
 * [x] add delete endpoint for mixes
-* [ ] add Router for Api
+* [x] add Router for Api
 
 #### User Profile / Auth
 * [x] create model for UserProfile
@@ -20,16 +21,20 @@ UserProfile
 ----
 
 * [x] setup API for JWT based Authentication
-** [ ] test Auth API 
+** [x] test Auth API 
 
-* [ ] check why CustomUser not working, signal to create profile not working
+* [x] check why CustomUser not working, signal to create profile not working
 
-* [ ] create API to create, update, delete, list User Profile
+* [x] create API to update, delete, list User Profile
+
+* [x] Check why views not wokring in Detail of Models
+
+* [x] make Rest API consice in terms of trailing slashes -> prob. remove them
 
 ---
 
 ### Frontend
 
 * setup react app
-* create basic Auth Component
-* Create Simple Login / Register Page
+* Create Login / Register Page
+* Create Auth Component which checks for if token is valid

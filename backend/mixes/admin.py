@@ -11,4 +11,5 @@ class MixAdmin(admin.ModelAdmin):
         "name",
         "description",
         "file",
+        "length_in_sec",
     ]

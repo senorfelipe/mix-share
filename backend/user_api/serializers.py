@@ -1,9 +1,5 @@
-from dataclasses import field
-from os import read
-from xml.dom import ValidationErr
-from django.forms import ValidationError
 from rest_framework import serializers
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 
 from .models import UserProfile
 
@@ -33,16 +29,24 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['bio', 'avatar', 'full_name', 'location']
-
-
 class UserSerializer(serializers.ModelSerializer):
-    profile = UserProfileSerializer
-
     class Meta:
         model: UserModel
         fields = ['email', 'username', 'password', 'profile']
         extra_kwargs = {'password': {'write_only': True}}
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'pk',
+            'username',
+            'full_name',
+            'avatar',
+            'bio',
+            'location',
+        ]
+        read_only_fields = ['username']
