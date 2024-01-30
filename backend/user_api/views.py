@@ -53,12 +53,13 @@ class LoginAPIView(APIView):
 
         user_instance = authenticate(username=email, password=user_password)
         if not user_instance:
-            raise AuthenticationFailed('User not found.')
+            raise AuthenticationFailed('Authentication not successful.')
 
         if user_instance.is_active:
             refresh_token = tokens.RefreshToken.for_user(user_instance)
             access_token = refresh_token.access_token
             response = Response(
+                status=status.HTTP_200_OK,
                 data={
                     'access_token': str(access_token),
                     'refresh_token': str(refresh_token),

@@ -35,6 +35,7 @@ UserProfile
 
 ### Frontend
 
-* setup react app
+* [x] setup react app
+* [ ] choose a component library
 * Create Login / Register Page
 * Create Auth Component which checks for if token is valid
