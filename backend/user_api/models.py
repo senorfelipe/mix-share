@@ -1,4 +1,5 @@
 import imp
+from os import uname
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import AbstractBaseUser, UserManager
@@ -7,10 +8,10 @@ from django.dispatch import receiver
 
 # Create your models here.
 class User(AbstractBaseUser):
-    username = models.CharField(max_length=100)
+    username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
 
     is_staff = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -37,7 +38,7 @@ class User(AbstractBaseUser):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=1000, blank=True, null=True)
-    avatar = models.ImageField(upload_to='user_avatars', blank=True, null=True)
+    avatar = models.ImageField(upload_to="user_avatars", blank=True, null=True)
     bio = models.CharField(max_length=100, null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
 
