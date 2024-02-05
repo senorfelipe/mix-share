@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import classes from '../styles/root.module.css';
 import image from '../assets/craiyon_181154_techno_dj_controller_setup_close_view.png';
 
-export default function Root() {
+export const HomePage = () => {
   const navigate = useNavigate();
 
   return (
@@ -55,4 +55,6 @@ export default function Root() {
       </Container>
     </>
   );
-}
+};
+
+export default HomePage;

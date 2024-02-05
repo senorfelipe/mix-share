@@ -1,3 +1,5 @@
+import token
+from django.http import HttpRequest
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework import viewsets, mixins
@@ -8,7 +10,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 
-from .models import UserProfile
+from .models import User, UserProfile
 
 from .serializers import (
     UserLoginSerializer,
@@ -16,7 +18,58 @@ from .serializers import (
     UserRegistrationSerializer,
 )
 
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
+
 UserModel = get_user_model()
+COOKIE_MAX_AGE_IN_SEC = 3600 * 24 * 14  # 14 days
+
+
+# answer from github to use httponly-cookie for refresh token (https://github.com/jazzband/djangorestframework-simplejwt/issues/71#issuecomment-762927394)
+class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+    refresh = None
+
+    def validate(self, attrs):
+        attrs['refresh'] = self.context['request'].COOKIES.get('refresh_token')
+        if attrs['refresh']:
+            return super().validate(attrs)
+        else:
+            raise InvalidToken('No valid token found in cookie \'refresh_token\'')
+
+
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def finalize_response(self, request, response, *args, **kwargs):
+        if response.data.get('refresh'):
+            cookie_max_age = COOKIE_MAX_AGE_IN_SEC
+            response.set_cookie(
+                'refresh_token', response.data['refresh'], max_age=cookie_max_age, httponly=True
+            )
+            del response.data['refresh']
+        return super().finalize_response(request, response, *args, **kwargs)
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def finalize_response(self, request, response, *args, **kwargs):
+        if response.data.get('refresh'):
+            cookie_max_age = COOKIE_MAX_AGE_IN_SEC
+            response.set_cookie(
+                'refresh_token', response.data['refresh'], max_age=cookie_max_age, httponly=True
+            )
+            del response.data['refresh']
+        return super().finalize_response(request, response, *args, **kwargs)
+
+    serializer_class = CookieTokenRefreshSerializer
+
+
+def get_login_response(user: User, status=status.HTTP_200_OK) -> Response:
+    refresh = tokens.RefreshToken.for_user(user)
+    data = {'access': str(refresh.access_token)}
+    response = Response(data=data, status=status)
+    response.set_cookie(
+        key='refresh_token', value=str(refresh), httponly=True, domain="127.0.0.1",
+    )
+    return response
 
 
 # Create your views here.
@@ -29,10 +82,7 @@ class RegistrationAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             new_user = serializer.save()
             if new_user:
-                refresh = tokens.RefreshToken.for_user(new_user)
-                data = {'access_token': str(refresh.access_token), 'refresh_token': str(refresh)}
-                response = Response(data=data, status=status.HTTP_201_CREATED)
-                # response.set_cookie(key='access_token', value=refresh.access_token, httponly=True)
+                response = self.getLoginResponse(new_user, status.HTTP_201_CREATED)
                 return response
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -56,15 +106,7 @@ class LoginAPIView(APIView):
             raise AuthenticationFailed('Authentication not successful.')
 
         if user_instance.is_active:
-            refresh_token = tokens.RefreshToken.for_user(user_instance)
-            access_token = refresh_token.access_token
-            response = Response(
-                status=status.HTTP_200_OK,
-                data={
-                    'access_token': str(access_token),
-                    'refresh_token': str(refresh_token),
-                }
-            )
+            response = get_login_response(user_instance)
             return response
 
         return Response(
@@ -75,15 +117,17 @@ class LoginAPIView(APIView):
 class LogoutAPIView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request):
+    def post(self, request: HttpRequest):
         try:
-            refresh_token = request.data['refresh_token']
+            refresh_token = request.COOKIES.get['refresh_token']
             if refresh_token:
                 token = tokens.RefreshToken(refresh_token)
                 token.blacklist()
-            return Response("User logged out successfuly", status=status.HTTP_200_OK)
+                response = Response('User logged out successfuly', status=status.HTTP_200_OK)
+                response.delete_cookie('refresh_token')
+                return response
         except tokens.TokenError:
-            raise AuthenticationFailed("Invalid Token")
+            raise AuthenticationFailed('Invalid Token')
 
 
 class UserProfileViewSet(
@@ -92,8 +136,6 @@ class UserProfileViewSet(
     mixins.ListModelMixin,
     mixins.UpdateModelMixin,
 ):
-    # TODO change permission
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-

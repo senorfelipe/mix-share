@@ -5,7 +5,7 @@ from mixes.models import Mix
 from rest_framework import status
 from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 
 
 class MixListRetreiveCreateDestroyViewSet(
@@ -18,7 +18,7 @@ class MixListRetreiveCreateDestroyViewSet(
     queryset = Mix.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = MixSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')

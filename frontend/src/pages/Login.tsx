@@ -1,4 +1,8 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Button,
   Container,
   FormControl,
@@ -8,20 +12,37 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { API } from "../api";
 import { PasswordInput } from "../components/PasswordInput";
-import axios from "axios";
+import { useAuth } from "../provider/AuthProvider";
 
 const Login = () => {
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [loginFailed, setLoginFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [password, setPassword] = useState("");
 
-  const LOGIN_URL = "http://127.0.0.1:8000/api/user/login";
+  const LOGIN_PATH = "/user/login";
 
   const handleLogin = () => {
-    axios.post(LOGIN_URL, { email, password }).then((response) => {
-      alert("You sent log in request")
-      console.log(response.data);
-    });
+    API.post(LOGIN_PATH, { email, password })
+      .then((response) => {
+        console.log("login data: " + response.data["access"]);
+        setToken(response.data["access"]);
+        navigate("/", { replace: true });
+      })
+      .catch((error) => {
+        setLoginFailed(true);
+        console.log(JSON.stringify(error));
+        const message =
+          error.response.status === 401
+            ? "Check your email and password."
+            : error.message;
+        setErrorMessage(message);
+      });
   };
 
   return (
@@ -42,6 +63,13 @@ const Login = () => {
         <Button colorScheme="teal" onClick={() => handleLogin()}>
           Login
         </Button>
+        {loginFailed && (
+          <Alert status="error">
+            <AlertIcon />
+            <AlertTitle>Login failed :O</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
         <StackDivider height={"0.3rem"}></StackDivider>
         <Button colorScheme="real" variant="outline">
           Create New Account
