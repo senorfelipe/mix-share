@@ -1,21 +1,21 @@
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Button,
-  Container,
-  FormControl,
-  FormLabel,
-  Input,
-  StackDivider,
-  VStack,
+    Alert,
+    AlertDescription,
+    AlertIcon,
+    AlertTitle,
+    Button,
+    Container,
+    FormControl,
+    FormLabel,
+    Input,
+    StackDivider,
+    VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API } from "../api";
+import { API } from "../axios";
 import { PasswordInput } from "../components/PasswordInput";
-import { useAuth } from "../provider/AuthProvider";
+import { useAuth } from "../service/AuthProvider";
 
 const Login = () => {
   const { setToken } = useAuth();
@@ -38,7 +38,7 @@ const Login = () => {
         setLoginFailed(true);
         console.log(JSON.stringify(error));
         const message =
-          error.response.status === 401
+          error.response?.status === 401
             ? "Check your email and password."
             : error.message;
         setErrorMessage(message);

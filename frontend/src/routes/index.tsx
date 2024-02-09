@@ -1,11 +1,11 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import ErrorPage from "../ErrorPage";
-import Login from "../pages/Login";
-import { useAuth } from "../provider/AuthProvider";
-import { ProtectedRoute } from "./ProtectedRoute";
 import HomePage from "../pages/HomePage";
+import Login from "../pages/Login";
 import { MixesPage } from "../pages/MixesPage";
 import { UserProfile } from "../pages/UserProfile";
+import { useAuth } from "../service/AuthProvider";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 const Routes = () => {
   const { token } = useAuth();

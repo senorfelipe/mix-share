@@ -13,6 +13,7 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
+    # TODO: is_staff is not needed, maybe even delete is_superuser?
     is_staff = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
 

@@ -10,10 +10,11 @@ export const API = axios.create(
     }
 )
 
+
 export const useApi = (params: AxiosRequestConfig<unknown>) => {
     const [loading, setLoading] = useState(true)
-    const [data, setData] = useState<unknown>(null)
-    const [error, setError] = useState<unknown>(null)
+    const [data, setData] = useState<unknown>(null);
+    const [error, setError] = useState<unknown>(null);
 
     const fetchData = async (): Promise<void> => {
         try {

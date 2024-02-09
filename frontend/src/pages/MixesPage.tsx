@@ -1,18 +1,18 @@
 import {
-  Box,
-  Card,
-  CardBody,
-  CardHeader,
-  Container,
-  Flex,
-  Heading,
-  Stack,
-  StackDivider,
-  Text,
-  UnorderedList,
+    Box,
+    Card,
+    CardBody,
+    CardHeader,
+    Container,
+    Flex,
+    Heading,
+    Stack,
+    StackDivider,
+    Text,
+    UnorderedList,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useApi } from "../api";
+import { useApi } from "../axios";
 import LogoutButton from "../components/LogoutButton";
 import { IMix } from "../types";
 

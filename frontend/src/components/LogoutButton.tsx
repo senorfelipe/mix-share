@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../provider/AuthProvider';
-import { Button } from '@chakra-ui/react';
+import { Button } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../service/AuthProvider";
 
 const LogoutButton = () => {
   const { setToken } = useAuth();
@@ -8,7 +8,7 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     setToken(null);
-    navigate('/', { replace: true });
+    navigate("/", { replace: true });
   };
 
   return (

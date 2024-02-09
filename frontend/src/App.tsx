@@ -1,16 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from "react";
+import ReactDOM from "react-dom/client";
 
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider } from "@chakra-ui/react";
 
-import AuthProvider from './provider/AuthProvider';
-import Routes from './routes';
+import Routes from "./routes";
+import AuthProvider from "./service/AuthProvider";
+import { AxiosInterceptor } from "./axios/interceptors";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ChakraProvider>
       <AuthProvider>
-        <Routes />
+        <AxiosInterceptor>
+          <Routes />
+        </AxiosInterceptor>
       </AuthProvider>
     </ChakraProvider>
   </React.StrictMode>
