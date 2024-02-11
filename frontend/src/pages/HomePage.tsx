@@ -29,7 +29,7 @@ export const HomePage = () => {
         gap="2"
       >
         <Box p="2">
-          <Heading size="lg">Mixit</Heading>
+          <Heading size="lg">MixHub</Heading>
         </Box>
         <Spacer />
         <ButtonGroup gap="2">

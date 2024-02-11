@@ -40,5 +40,6 @@ UserProfile
 * [x] Create Auth Component which checks for if token is valid
 ** [x] automatic refresh of access token
 * [x] useApi hook for api requests
-* [ ] what if refresh token expires?? -> redirect to login
-* [ ] Create Login / Register Page
+* [x] what if refresh token expires?? -> redirect to login
+* [x] Create Login
+* [ ] Create Register Page

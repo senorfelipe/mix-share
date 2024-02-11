@@ -6,6 +6,7 @@ import { MixesPage } from "../pages/MixesPage";
 import { UserProfile } from "../pages/UserProfile";
 import { useAuth } from "../service/AuthProvider";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { Register } from "../pages/Register";
 
 const Routes = () => {
   const { token } = useAuth();
@@ -19,6 +20,11 @@ const Routes = () => {
     {
       path: "/about-us",
       element: <div>About Us</div>,
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
       errorElement: <ErrorPage />,
     },
   ];

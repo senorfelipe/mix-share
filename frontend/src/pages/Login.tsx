@@ -1,15 +1,17 @@
 import {
-    Alert,
-    AlertDescription,
-    AlertIcon,
-    AlertTitle,
-    Button,
-    Container,
-    FormControl,
-    FormLabel,
-    Input,
-    StackDivider,
-    VStack,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  Container,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  StackDivider,
+  VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -47,34 +49,43 @@ const Login = () => {
 
   return (
     <Container mt={"3rem"}>
-      <VStack align="stretch">
-        <FormControl>
-          <FormLabel>Email</FormLabel>
-          <Input
-            id="useremail"
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <FormLabel>Password</FormLabel>
-          <PasswordInput password={password} onChange={setPassword} />
-        </FormControl>
-        <Button colorScheme="teal" onClick={() => handleLogin()}>
-          Login
-        </Button>
-        {loginFailed && (
-          <Alert status="error">
-            <AlertIcon />
-            <AlertTitle>Login failed :O</AlertTitle>
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        )}
-        <StackDivider height={"0.3rem"}></StackDivider>
-        <Button colorScheme="real" variant="outline">
-          Create New Account
-        </Button>
-      </VStack>
+      <Box>
+        <Heading size="lg" mb="0.8rem" transform="capitalize">
+          LOGIN
+        </Heading>
+        <VStack align="stretch">
+          <FormControl>
+            <FormLabel>Email</FormLabel>
+            <Input
+              id="useremail"
+              type="email"
+              placeholder="Enter Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <FormLabel>Password</FormLabel>
+            <PasswordInput password={password} onChange={setPassword} />
+          </FormControl>
+          <Button colorScheme="teal" onClick={() => handleLogin()}>
+            Login
+          </Button>
+          {loginFailed && (
+            <Alert status="error">
+              <AlertIcon />
+              <AlertTitle>Login failed :O</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+          <StackDivider height={"0.3rem"}></StackDivider>
+          <Button
+            colorScheme="real"
+            variant="outline"
+            onClick={() => navigate("/register")}
+          >
+            Create New Account
+          </Button>
+        </VStack>
+      </Box>
     </Container>
   );
 };
