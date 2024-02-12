@@ -17,8 +17,10 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Api } from "../axios/api";
 import { PasswordInput } from "../components/PasswordInput";
-import { API } from "../axios";
+import { useAuth } from "../service/AuthProvider";
+import { AxiosHeaders } from "axios";
 
 export const Register = () => {
   const [email, setEmail] = useState("");
@@ -26,12 +28,18 @@ export const Register = () => {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [registrationFailed, setRegistrationFailed] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [submitTried, setSubmitTried] = useState(false);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const navigate = useNavigate();
+  const { setToken } = useAuth();
 
   const passwordsValid =
-    !!password && !!passwordConfirm && password === passwordConfirm;
+    password.length >= 8 &&
+    passwordConfirm.length >= 8 &&
+    password === passwordConfirm;
+
+  const passwordFeedbackMsg =
+    "Passwords must be the same and minimum 8 characters";
 
   const isValidEmail = () => {
     return (
@@ -44,29 +52,49 @@ export const Register = () => {
     );
   };
 
+  const isValidInput = () => {
+    return passwordsValid && isValidEmail() && !!username;
+  };
+
   const handleRegistration = () => {
-    if (!passwordsValid || !isValidEmail() || !username) {
-      setErrorMessage("Please check your inputs once again :)");
-      setRegistrationFailed(true);
-      setSubmitted(true);
-    } else {
-      setRegistrationFailed(false);
-      API.post("/user/register", {
-        email: email,
-        username: username,
-        password: password,
-      });
+    if (!isValidInput()) {
+      console.log("no valid input");
+      setSubmitTried(true);
+      return;
     }
+    Api.renewInstance().post("/user/register", {
+      email: email,
+      username: username,
+      password: password,
+    })
+      .then((response) => {
+        if (response.status === 201) {
+          setRegistrationFailed(false);
+          setToken(response.data["access"]);
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        setErrorMessages([]);
+        setRegistrationFailed(true);
+        if (error.response?.status !== 500 && error.response?.data) {
+          for (const k in error.response.data) {
+            setErrorMessages((msg) => [...msg, error.response.data[k]]);
+          }
+        } else {
+          setErrorMessages([error.message]);
+        }
+      });
   };
 
   return (
     <Container mt={"3rem"}>
       <Box boxSize="lg">
         <Heading size="lg" mb="0.8rem">
-          SIGN UP
+          Create new Account
         </Heading>
         <VStack align="stretch">
-          <FormControl isInvalid={submitted && !isValidEmail()}>
+          <FormControl isInvalid={submitTried && !isValidEmail()}>
             <FormLabel>Email</FormLabel>
             <Input
               id="useremail"
@@ -76,8 +104,13 @@ export const Register = () => {
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="on"
             />
+            {!isValidEmail() && (
+              <FormErrorMessage>
+                Please check your provided email
+              </FormErrorMessage>
+            )}
           </FormControl>
-          <FormControl isInvalid={submitted && !username}>
+          <FormControl isInvalid={submitTried && !username}>
             <FormLabel>Username</FormLabel>
             <Input
               id="username"
@@ -88,7 +121,7 @@ export const Register = () => {
               autoComplete="on"
             />
           </FormControl>
-          <FormControl isInvalid={submitted && !passwordsValid}>
+          <FormControl isInvalid={submitTried && !passwordsValid}>
             <FormLabel>Password</FormLabel>
             <PasswordInput
               inputId="userpasword"
@@ -96,10 +129,10 @@ export const Register = () => {
               onChange={setPassword}
             />
             {!passwordsValid && (
-              <FormErrorMessage>Passwords are not equal :S</FormErrorMessage>
+              <FormErrorMessage>{passwordFeedbackMsg}</FormErrorMessage>
             )}
           </FormControl>
-          <FormControl isInvalid={submitted && !passwordsValid}>
+          <FormControl isInvalid={submitTried && !passwordsValid}>
             <FormLabel>Confirm Password</FormLabel>
             <PasswordInput
               inputId="userpaswordconfirm"
@@ -107,17 +140,26 @@ export const Register = () => {
               onChange={setPasswordConfirm}
             />
             {!passwordsValid && (
-              <FormErrorMessage>Passwords are not equal :S</FormErrorMessage>
+              <FormErrorMessage>{passwordFeedbackMsg}</FormErrorMessage>
             )}
           </FormControl>
           <Button colorScheme="teal" onClick={() => handleRegistration()}>
-            Register
+            Create Account
           </Button>
           {registrationFailed && (
             <Alert status="error">
               <AlertIcon />
-              <AlertTitle>Registration failed :O</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
+              <AlertTitle>Oooops</AlertTitle>
+              <Spacer />
+              <AlertDescription>
+                {
+                  <ul>
+                    {errorMessages.map((msg) => (
+                      <li>{msg}</li>
+                    ))}
+                  </ul>
+                }
+              </AlertDescription>
             </Alert>
           )}
           <StackDivider height={"0.3rem"}></StackDivider>

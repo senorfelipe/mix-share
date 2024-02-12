@@ -51,7 +51,7 @@ const Login = () => {
     <Container mt={"3rem"}>
       <Box>
         <Heading size="lg" mb="0.8rem" transform="capitalize">
-          LOGIN
+          Login
         </Heading>
         <VStack align="stretch">
           <FormControl>

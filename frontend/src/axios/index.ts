@@ -1,14 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { useEffect, useState } from "react";
-import { API_URL } from "../utils/constants";
+import { Api } from "./api";
 
-export const API = axios.create(
-    {
-        baseURL: API_URL,
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" }
-    }
-)
+
+export const API = Api.getInstance();
 
 
 export const useApi = (params: AxiosRequestConfig<unknown>) => {

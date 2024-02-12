@@ -27,12 +27,21 @@ object comment {
     user_id : bigint
     mix_id : bigint
     text : varchar(1000)
+    timestamp : now()
+}
+
+object followers {
+    user_id: bigint
+    follower_id: bigint
 }
 
 
 
 
 
+
+user <- followers
+user <- followers
 mix -> user
 user_profile --> user
 comment --> user

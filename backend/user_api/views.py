@@ -77,12 +77,12 @@ class RegistrationAPIView(APIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request):
+    def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             new_user = serializer.save()
             if new_user:
-                response = self.getLoginResponse(new_user, status.HTTP_201_CREATED)
+                response = get_login_response(new_user, status.HTTP_201_CREATED)
                 return response
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -3,6 +3,14 @@
 
 ## TODOs
 
+## Phase 1
+- Backend:
+* user authentication using jwt
+* user profiles, with crud operations
+* mix model with possible upload
+- Frontend:
+* login, resgister and simple home page
+
 ### Backend
 
 #### Mixes
@@ -42,4 +50,54 @@ UserProfile
 * [x] useApi hook for api requests
 * [x] what if refresh token expires?? -> redirect to login
 * [x] Create Login
-* [ ] Create Register Page
+* [x] Create Register Page
+
+
+## Phase 2.0 - Fokus Backend (bis 19.02)
+- backend:
+* setup followers table, with api to follow / defollow users
+* setup comments table with api to comment on a mix, delete
+ comment, update comment
+* find way to stream mixes - django media server? / api?
+** django data chunks?
+* view für feed
+* view für nicht angemeldete Nutzer (random?)
+* restrict views as needed: 
+** user profiles -> readonly if not UserProfile.user = user
+** mixes -> readonly -,,-
+** comment -> readonly -,,-
+
+
+#### Testing Backend
+* write tests for these use cases:
+** user authenticates, logs in using access token
+** user uses access token after expire time
+** user refreshs access token using cookie
+** user follows user, user defollows user
+** user comments on mix, user updated comment, user deletes comment
+
+
+## Phase 2.1 - Fokus Frontend 
+
+* frontend: 
+- homepage mit feed
+** mix componente -> audio player, dj referenz, titel, etc. 
+- homepage mit unpersönlichem feed (nicht angemeldete Nutzer)
+- mix detail page
+- user profile page
+
+#### Manuelles Testing
+- Funktionalitäten sicherstellen
+
+## Phase 2.2 - Fokus UI / UX
+- Farbschema überlegen, intergrieren, Logo? :D
+- Design eventuell überarbeiten
+- einheitlichkeit von Terminologie
+
+
+## Phase 3.0 - Deployment CI / CD
+- setup automated testing when pushing to master, possible for free?
+- evaluate good options where to host?
+- evaluate what is needed in first place for the platform?
+
+
