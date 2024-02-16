@@ -4,14 +4,17 @@ from .views import (
     RegistrationAPIView,
     LoginAPIView,
     LogoutAPIView,
+    UserFollowView,
     UserProfileViewSet,
 )
 from rest_framework.routers import DefaultRouter
 profile_router = DefaultRouter(trailing_slash=False)
-profile_router.register(r'profiles', UserProfileViewSet)
+profile_router.register(r'', UserProfileViewSet)
 
 urlpatterns = [
     path('', include(profile_router.urls)),
+    path('<int:follower_id>/follow/<int:followee_id>', UserFollowView.as_view()),
+    path('<int:follower_id>/unfollow/<int:followee_id>', UserFollowView.as_view()),
     path('token/refresh', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('register', RegistrationAPIView.as_view(), name='register'),
     path('login', LoginAPIView.as_view(), name='login'),

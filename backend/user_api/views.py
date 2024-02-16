@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 
-from .models import User, UserProfile
+from .models import Follow, User, UserProfile
 
 from .serializers import (
     UserLoginSerializer,
@@ -67,7 +67,10 @@ def get_login_response(user: User, status=status.HTTP_200_OK) -> Response:
     data = {'access': str(refresh.access_token)}
     response = Response(data=data, status=status)
     response.set_cookie(
-        key='refresh_token', value=str(refresh), httponly=True, domain="127.0.0.1",
+        key='refresh_token',
+        value=str(refresh),
+        httponly=True,
+        domain="127.0.0.1",
     )
     return response
 
@@ -139,3 +142,28 @@ class UserProfileViewSet(
     permission_classes = [permissions.IsAuthenticated]
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+
+
+class UserFollowView(APIView):
+
+    def post(self, request, follower_id, followee_id):
+        try:
+            followee_profile = UserProfile.objects.get(id=followee_id)
+            follower_profile = UserProfile.objects.get(id=follower_id)
+            Follow.objects.create(follower=follower_profile, followee=followee_profile)
+            return Response(status=status.HTTP_201_CREATED)
+        except UserProfile.DoesNotExist:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST, data={"message": "No user exits for given id"}
+            )
+
+    def delete(self, request, follower_id, followee_id):
+        try:
+            followee_profile = UserProfile.objects.get(id=followee_id)
+            follower_profile = UserProfile.objects.get(id=follower_id)
+            Follow.objects.filter(follower=follower_profile, followee=followee_profile)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserProfile.DoesNotExist:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST, data={"message": "No user exits for given id"}
+            )

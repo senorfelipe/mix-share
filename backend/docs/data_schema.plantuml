@@ -1,47 +1,55 @@
 @startuml database
-object mix {
-    id : bigint
-    user_id : bigint
-    name : char(200)
-    upload_time : timestamp
-    filepath : char(200) 
-    length_in_sec : int
+
+
+package user_api {
+    object user {
+        user_name : varchar
+        email : varchar
+        is_staff : boolean
+        is_superuser : boolean
+    }
+    object user_profile {
+        user_id : bigint
+        full_name : varchar
+        bio : varchar
+        location : varchar
+        avatar : varchar
+    }
+
+    object follows {
+        followee_id: bigint
+        follower_id: bigint
+    }
 }
 
-object user {
-    user_name : varchar
-    email : varchar
-    is_staff : boolean
-    is_superuser : boolean
-}
+package mixes {
 
-object user_profile {
-    user_id : bigint
-    full_name : varchar
-    bio : varchar
-    location : varchar
-    avatar : varchar
-}
+    object mix {
+        id : bigint
+        user_id : bigint
+        name : char(200)
+        upload_time : timestamp
+        filepath : char(200)
+        length_in_sec : int
+    }
 
-object comment {
-    user_id : bigint
-    mix_id : bigint
-    text : varchar(1000)
-    timestamp : now()
-}
+    object comment {
+        user_id : bigint
+        mix_id : bigint
+        text : varchar(1000)
+        timestamp : now()
+    }
 
-object followers {
-    user_id: bigint
-    follower_id: bigint
+
+
 }
 
 
 
 
 
-
-user <- followers
-user <- followers
+user <-- follows
+user <-- follows
 mix -> user
 user_profile --> user
 comment --> user
