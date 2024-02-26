@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from mixes.models import Mix
+from mixes.models import Comment, Mix
 
 
 # Register your models here.
@@ -12,4 +12,13 @@ class MixAdmin(admin.ModelAdmin):
         "description",
         "file",
         "length_in_sec",
+    ]
+
+
+@admin.register(Comment)
+class MixAdmin(admin.ModelAdmin):
+    fields = [
+        "author",
+        "time",
+        "text",
     ]

@@ -1,24 +1,21 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from .permissions import IsOwnerOfCommentOrRealOnly, IsOwnerOfMixOrRealOnly
 from mixes import service
-from mixes.serializer import MixSerializer
-from mixes.models import Mix
+from mixes.serializer import CommentSerializer, MixSerializer
+from mixes.models import Comment, Mix
 from rest_framework import status
-from rest_framework.viewsets import mixins, GenericViewSet
+from rest_framework.viewsets import mixins, generics, ModelViewSet, GenericViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 
 
-class MixListRetreiveCreateDestroyViewSet(
-    GenericViewSet,
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-):
+class MixViewSet(ModelViewSet):
     queryset = Mix.objects.all()
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = MixSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOfMixOrRealOnly]
+    lookup_url_kwarg = "mix_id"
 
     def create(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
@@ -35,10 +32,30 @@ class MixListRetreiveCreateDestroyViewSet(
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
-    
+
     def retrieve(self, request, *args, **kwargs):
+        # TODO: find good way to stream the audio data
         return super().retrieve(request, *args, **kwargs)
-    
+
     def destroy(self, request, *args, **kwargs):
-        # only allowed if user is owner
         return super().destroy(request, *args, **kwargs)
+
+
+class CommentViewSet(
+    GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+):
+    queryset = Comment.objects.all()
+    # TODO: cehck serializer as only parameter needed is text, mix -> url, user -> request
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOfCommentOrRealOnly]
+    lookup_url_kwarg = "comment_id"
+
+    def get_queryset(self):
+        return self.queryset.filter(mix_id=self.kwargs["mix_id"])
+
+    def perform_create(self, serializer):
+        serializer.save(mix_id=self.kwargs["mix_id"])

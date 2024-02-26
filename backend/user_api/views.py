@@ -1,8 +1,7 @@
-import token
 from django.http import HttpRequest
 from rest_framework import permissions
 from rest_framework.views import APIView
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, generics
 from rest_framework.response import Response
 from rest_framework_simplejwt import tokens
 from rest_framework import status
@@ -16,6 +15,7 @@ from .serializers import (
     UserLoginSerializer,
     UserProfileSerializer,
     UserRegistrationSerializer,
+    UserSerializer,
 )
 
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
@@ -161,9 +161,18 @@ class UserFollowView(APIView):
         try:
             followee_profile = UserProfile.objects.get(id=followee_id)
             follower_profile = UserProfile.objects.get(id=follower_id)
-            Follow.objects.filter(follower=follower_profile, followee=followee_profile)
+            Follow.objects.filter(follower=follower_profile, followee=followee_profile).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except UserProfile.DoesNotExist:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST, data={"message": "No user exits for given id"}
             )
+
+
+class FollowersListView(generics.ListAPIView):
+    serializer_class = UserProfileSerializer
+
+    def get_queryset(self):
+        username = self.kwargs["user_id"]
+        user = get_object_or_404(User, username=username)
+        return user.followers.all()

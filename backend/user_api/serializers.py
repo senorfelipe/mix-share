@@ -1,6 +1,6 @@
-from dataclasses import field
-from pyexpat import model
+from cgitb import lookup
 from rest_framework import serializers
+from rest_framework.serializers import HyperlinkedIdentityField
 from django.contrib.auth import get_user_model
 
 from .models import UserProfile
@@ -40,7 +40,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
-
+    followers = HyperlinkedIdentityField(
+        lookup_field="user_id",
+        view_name="user-followers",
+    )
     class Meta:
         model = UserProfile
         fields = [
@@ -50,5 +53,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'avatar',
             'bio',
             'location',
+            'followers'
         ]
         read_only_fields = ['username']

@@ -19,13 +19,13 @@ class Mix(models.Model):
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    mix = models.ForeignKey(Mix, on_delete=models.CASCADE)
+    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    mix = models.ForeignKey(Mix, on_delete=models.CASCADE, related_name="comments")
     text = models.CharField(max_length=2000)
     time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name_plural = "Comments"
+        verbose_name_plural = 'Comments'
 
     def __str__(self) -> str:
-        return f'{self.user}: "{self.text}"'
+        return f'{self.author}: "{self.text}"'
