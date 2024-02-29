@@ -56,7 +56,7 @@ UserProfile
 ## Phase 2.0 - Fokus Backend (bis 10.03)
 - backend:
 * [x] setup followers table, with api to follow / defollow users
-* [ ] setup comments table with api to comment on a mix, delete
+* [x] setup comments table with api to comment on a mix, delete
  comment, update comment
  ** check that user that requests is owner of the comment
  ** check how to use _id for the model fields in http body (check serializer)
@@ -65,9 +65,9 @@ UserProfile
 * [ ] view für feed
 * [ ] view für nicht angemeldete Nutzer (random?)
 * restrict views as needed: 
-** [ ] user profiles -> readonly if not UserProfile.user = user
-** [ ] mixes -> readonly -,,-
-** [ ] comment -> readonly -,,-
+** [x] user profiles -> readonly if not UserProfile.user = user
+** [x] mixes -> readonly -,,-
+** [x] comment -> readonly -,,-
 
 
 #### Testing Backend
@@ -79,7 +79,7 @@ UserProfile
 * Followers
 ** [x] user follows user, user defollows user
 * Comments
-** [ ] user comments on mix, user updated comment, user deletes comment
+** [x] user comments on mix, user updated comment, user deletes comment
 * Profiles
 ** [ ] test only owner of the profile can do actions
 
@@ -109,4 +109,5 @@ UserProfile
 
 ## Tech Debt
 - testing -> create utils for common use cases (user creation, etc.)
+- user_id / profile_id are treated identical -> distinguish them
 

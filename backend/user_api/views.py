@@ -1,19 +1,25 @@
+from crypt import methods
 from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework import viewsets, mixins, generics
-from rest_framework.response import Response
 from rest_framework_simplejwt import tokens
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
+
+from .permissions import IsOwnerOfProfileOrRealOnly
 
 from .models import Follow, User, UserProfile
 
 from .serializers import (
     UserLoginSerializer,
     UserProfileSerializer,
+    UserProfileSerializerHyperlinkedFollowers,
     UserRegistrationSerializer,
     UserSerializer,
 )
@@ -138,10 +144,17 @@ class UserProfileViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
     mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
 ):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOfProfileOrRealOnly]
     queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+    serializer_class = UserProfileSerializerHyperlinkedFollowers
+
+    @action(detail=False, methods=["GET"])
+    def me(self, request):
+        me = UserProfile.objects.get(user=request.user)
+        response_data = self.serializer_class(me, context={"request": request}).data
+        return Response(status=status.HTTP_200_OK, data=response_data)
 
 
 class UserFollowView(APIView):
@@ -173,6 +186,7 @@ class FollowersListView(generics.ListAPIView):
     serializer_class = UserProfileSerializer
 
     def get_queryset(self):
-        username = self.kwargs["user_id"]
-        user = get_object_or_404(User, username=username)
-        return user.followers.all()
+        user_id = self.kwargs["user_id"]
+        user = get_object_or_404(UserProfile, id=user_id)
+        follower_ids = [follow.follower.id for follow in user.followers.all()]
+        return UserProfile.objects.filter(id__in=follower_ids)

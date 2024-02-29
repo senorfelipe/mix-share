@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework_simplejwt import tokens
 from rest_framework import status
 
-from user_api.models import User
+from user_api.models import User, UserProfile
 from mixes.models import Mix, Comment
 from os import path
 
@@ -40,11 +40,18 @@ class CommentTestCase(APITestCase):
     def test_user_can_only_modify_own_comment(self):
         comment_user_two = Comment.objects.create(author=self.user_two, mix=self.mix, text="comment user 2")
 
-        response = self.client.patch(
+        response = self.client.put(
             path=f"/api/mixes/{self.mix.id}/comments/{comment_user_two.id}",
             data={"text": "update comment"},
         )
         print(response.json())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+
+    def test_user_can_delete_comment(self):
+        comment_user_one = Comment.objects.create(author=self.user_one, mix=self.mix, text="comment user 1")
+        
+        response = self.client.delete(path=f"/api/mixes/{self.mix.id}/comments/{comment_user_one.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(0, Comment.objects.filter(id=comment_user_one.id).count())
 
