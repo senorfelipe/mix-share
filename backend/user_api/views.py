@@ -76,7 +76,7 @@ def get_login_response(user: User, status=status.HTTP_200_OK) -> Response:
         key='refresh_token',
         value=str(refresh),
         httponly=True,
-        domain="127.0.0.1",
+        domain="127.0.0.1", #TODO fix before production deployment
     )
     return response
 

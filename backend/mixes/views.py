@@ -1,10 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+
+from .renderers import AudioMPEGRenderer
 from .permissions import IsOwnerOfCommentOrRealOnly, IsOwnerOfMixOrRealOnly
 from mixes import service
 from mixes.serializer import CommentSerializer, MixSerializer
 from mixes.models import Comment, Mix
 from rest_framework import status
+from rest_framework.renderers import JSONRenderer
 from rest_framework.viewsets import mixins, generics, ModelViewSet, GenericViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
@@ -12,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 
 class MixViewSet(ModelViewSet):
     queryset = Mix.objects.all()
+    renderer_classes = [JSONRenderer, AudioMPEGRenderer]
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = MixSerializer
     permission_classes = [IsAuthenticated, IsOwnerOfMixOrRealOnly]
@@ -31,9 +35,14 @@ class MixViewSet(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
-        # TODO: find good way to stream the audio data
-        return super().retrieve(request, *args, **kwargs)
+        mix = get_object_or_404(Mix, id=self.kwargs['mix_id'])
+        accept_header = request.headers.get('Accept', '')
 
+        if 'audio/mpeg' in accept_header:
+            return service.stream(request, mix.file.path)
+        else:
+            serializer = self.get_serializer(mix)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class CommentViewSet(
