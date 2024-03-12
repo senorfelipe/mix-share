@@ -60,7 +60,7 @@ UserProfile
  comment, update comment
  ** check that user that requests is owner of the comment
  ** check how to use _id for the model fields in http body (check serializer)
-* [ ] find way to stream mixes - django media server? / api?
+* [x] find way to stream mixes - django media server? / api? -> Streaming Response with HTTP Range Header
 ** django data chunks?
 * [ ] view für feed
 * [ ] view für nicht angemeldete Nutzer (random?)
@@ -81,7 +81,7 @@ UserProfile
 * Comments
 ** [x] user comments on mix, user updated comment, user deletes comment
 * Profiles
-** [ ] test only owner of the profile can do actions
+** [x] test only owner of the profile can do actions
 
 ## Phase 2.1 - Fokus Frontend 
 

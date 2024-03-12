@@ -163,6 +163,6 @@ cython_debug/
 
 # media files
 backend/mix_files/*
-
+/mix_files
 # vscode
 .vscode/*

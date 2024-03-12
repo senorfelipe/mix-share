@@ -38,16 +38,25 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializerHyperlinkedFollowers(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.CharField(source='user.username')
     followers = HyperlinkedIdentityField(
         lookup_field="user_id",
         view_name="user-followers",
     )
 
+    def update(self, instance, validated_data):
+        # Update username if provided in the validated data
+        user_data = validated_data.pop('user', None)
+        if user_data and 'username' in user_data:
+            user = instance.user
+            user.username = user_data['username']
+            user.save()
+        return super().update(instance, validated_data)
+
     class Meta:
         model = UserProfile
         fields = ['pk', 'username', 'full_name', 'avatar', 'bio', 'location', 'followers']
-        read_only_fields = ['username']
+        read_only_fields = ['username', 'pk']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

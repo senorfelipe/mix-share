@@ -150,12 +150,12 @@ class UserProfileViewSet(
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializerHyperlinkedFollowers
 
-    @action(detail=False, methods=["GET"])
+    @action(detail=False, methods=['GET'])
     def me(self, request):
         me = UserProfile.objects.get(user=request.user)
         response_data = self.serializer_class(me, context={"request": request}).data
         return Response(status=status.HTTP_200_OK, data=response_data)
-
+    
 
 class UserFollowView(APIView):
 

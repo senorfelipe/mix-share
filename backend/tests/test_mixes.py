@@ -44,7 +44,6 @@ class CommentTestCase(APITestCase):
             path=f"/api/mixes/{self.mix.id}/comments/{comment_user_two.id}",
             data={"text": "update comment"},
         )
-        print(response.json())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 

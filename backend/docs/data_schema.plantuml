@@ -19,6 +19,7 @@ package user_api {
     object follows {
         followee_id: bigint
         follower_id: bigint
+        time: now()
     }
 }
 
