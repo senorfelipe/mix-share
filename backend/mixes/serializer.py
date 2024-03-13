@@ -1,12 +1,6 @@
-from os import read
-from xml.dom import NotFoundErr
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
-from mixes import service
 from .models import Comment, Mix
-from .service import VALID_FILE_TYPES
 
 
 class MixSerializer(serializers.ModelSerializer):
@@ -28,6 +22,7 @@ class MixSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     mix_id = serializers.PrimaryKeyRelatedField(read_only=True)
     username = serializers.CharField(source="author.username", read_only=True)
+
     class Meta:
         model = Comment
         fields = ['id', 'mix_id', 'text', 'username']

@@ -72,16 +72,18 @@ UserProfile
 
 #### Testing Backend
 * write tests for these use cases:
-* Auth
-** [ ] user authenticates, logs in using access token
-** [ ] user uses access token after expire time
-** [ ] user refreshs access token using cookie
 * Followers
 ** [x] user follows user, user defollows user
 * Comments
 ** [x] user comments on mix, user updated comment, user deletes comment
 * Profiles
 ** [x] test only owner of the profile can do actions
+* Mixes
+** [x] test analysis of audio duration on upload with wav, and mp3
+* Auth
+** [ ] user authenticates, logs in using access token
+** [ ] user uses access token after expire time
+** [ ] user refreshs access token using cookie
 
 ## Phase 2.1 - Fokus Frontend 
 
@@ -108,6 +110,5 @@ UserProfile
 
 
 ## Tech Debt
-- testing -> create utils for common use cases (user creation, etc.)
 - user_id / profile_id are treated identical -> distinguish them
 

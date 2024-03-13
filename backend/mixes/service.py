@@ -1,23 +1,73 @@
+import contextlib
 import mimetypes
 import os
 from pkgutil import resolve_name
 import re
+import wave
 from wsgiref.util import FileWrapper
 from django.http import StreamingHttpResponse
 from mutagen.mp3 import MP3
 from rest_framework import status
 
-VALID_FILE_TYPES = ["mp3", "wav"]
+
+class AudioAnalysisExeption(Exception):
+
+    def __init__(self, message="During analysis of the audio file an error occurred"):
+        self.message = message
+        super().__init__(self.message)
 
 
-def is_valid_file(filename) -> bool:
-    ext = filename.rpartition(".")[-1]
-    return ext in VALID_FILE_TYPES
+class AudioFileAnalyzer:
+    """
+    Takes an audio file (wav, mp3) as input and calculates its duration.
+    
+    Parameters: 
+        file (filelike)
+    Attributes: 
+        duration(int)
 
+    """
 
-def get_mix_length_in_sec(mix_file) -> int:
-    audio = MP3(mix_file)
-    return audio.info.length
+    VALID_FILE_TYPES = ("mp3", "wav")
+
+    def __init__(self, file) -> None:
+        if file is None:
+            raise AudioAnalysisExeption(f'Parameter "file" must be given.')
+        if not AudioFileAnalyzer.is_valid_file(file=file):
+            raise AudioAnalysisExeption(
+                f'Given file type is not supported. Supported types are {AudioFileAnalyzer.VALID_FILE_TYPES}.'
+            )
+        self.file = file
+        self._duration = None
+        self.calculate_duration()
+
+    @property
+    def duration(self):
+        return self._duration
+        
+    def calculate_duration(self) -> None:
+        file_ext = self.file.name.rpartition(".")[-1]
+        if file_ext == 'mp3':
+            self._duration = self.get_mp3_length_in_sec()
+        elif file_ext == 'wav':
+            self._duration = self.get_wav_length_in_sec()
+        return None
+
+    @classmethod
+    def is_valid_file(cls, file) -> bool:
+        ext = file.name.rpartition(".")[-1]
+        return ext in AudioFileAnalyzer.VALID_FILE_TYPES
+
+    def get_mp3_length_in_sec(self) -> int:
+        audio = MP3(self.file)
+        return audio.info.length
+
+    def get_wav_length_in_sec(self) -> int:
+        with contextlib.closing(wave.open(self.file, 'r')) as f:
+            frames = f.getnframes()
+            rate = f.getframerate()
+            duration = frames / float(rate)
+            return int(duration)
 
 
 range_re = re.compile(r'bytes\s*=\s*(\d+)\s*-\s*(\d*)', re.I)
@@ -54,6 +104,7 @@ class RangeFileWrapper(object):
                 raise StopIteration
             self.remaining -= len(data)
             return data
+
 
 def stream(request, path) -> StreamingHttpResponse:
     """

@@ -8,7 +8,7 @@ from mixes.serializer import CommentSerializer, MixSerializer
 from mixes.models import Comment, Mix
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
-from rest_framework.viewsets import mixins, generics, ModelViewSet, GenericViewSet
+from rest_framework.viewsets import mixins, ModelViewSet, GenericViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 
@@ -23,16 +23,22 @@ class MixViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
+        errors = {}
 
-        if service.is_valid_file(uploaded_file.name):
+        try:
+            audio_analyzer = service.AudioFileAnalyzer(uploaded_file)
             serializer = self.serializer_class(data=request.data)
             if serializer.is_valid():
-                lenght_in_sec = service.get_mix_length_in_sec(uploaded_file)
-                serializer.validated_data['length_in_sec'] = lenght_in_sec
+                serializer.validated_data['length_in_sec'] = audio_analyzer.duration
                 serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                errors.update(serializer.errors)
+        except service.AudioAnalysisExeption as e:
+            errors.update({'audio_file': 'While processing the audio file an error occured.'})
+            # TODO: Add logging output
+
+        return Response(data=errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
         mix = get_object_or_404(Mix, id=self.kwargs['mix_id'])
