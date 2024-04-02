@@ -18,6 +18,7 @@ class Mix(models.Model):
         return self.title
 
 
+
 class Comment(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     mix = models.ForeignKey(Mix, on_delete=models.CASCADE, related_name="comments")

@@ -34,14 +34,18 @@ package mixes {
         length_in_sec : int
     }
 
+    object predecoded_peaks {
+        id : bigint
+        mix_id: bigint
+        normalized_peak_values : double[] 
+    }
+
     object comment {
         user_id : bigint
         mix_id : bigint
         text : varchar(1000)
         timestamp : now()
     }
-
-
 
 }
 
@@ -52,6 +56,7 @@ package mixes {
 user <-- follows
 user <-- follows
 mix -> user
+mix <-- predecoded_peaks
 user_profile --> user
 comment --> user
 comment --> mix

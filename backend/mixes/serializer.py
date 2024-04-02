@@ -14,9 +14,7 @@ class MixSerializer(serializers.ModelSerializer):
             'file',
             'upload_time',
         ]
-        read_only_fields = [
-            'length_in_sec',
-        ]
+        read_only_fields = ['length_in_sec', 'file']
 
 
 class CommentSerializer(serializers.ModelSerializer):

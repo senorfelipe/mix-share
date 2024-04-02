@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from datetime import timedelta
+import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,7 +78,9 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60), #TODO: adapt access lifetime to 10 min when deploying
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=60
+    ),  # TODO: adapt access lifetime to 10 min when deploying
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -155,3 +159,29 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {'format': '%(asctime)s [%(levelname)s] %(name)s - %(message)s'},
+    },
+    'handlers': {
+        'console': {'level': 'DEBUG', 'class': 'logging.StreamHandler', 'formatter': 'standard'},
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'mixshare/logs/mixshare.log'),
+            'when': 'midnight',  # Rotate daily
+            'backupCount': 14,  # Keep up to 14 old log files
+            'formatter': 'standard',
+        },
+    },
+    'loggers': {
+        'mixshare': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+    },
+}

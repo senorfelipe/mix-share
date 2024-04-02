@@ -1,10 +1,15 @@
+import json
+import os
 import random
+import unittest
+from uu import decode
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt import tokens
 from rest_framework import status
 
+from mixes.service import AudioPeakDecoder
 from user_api.models import User
 from mixes.models import Mix, Comment
 from .utils import create_two_users, create_simple_uploaded_audio_file
@@ -107,3 +112,20 @@ class CommentTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(0, Comment.objects.filter(id=comment_user_one.id).count())
+
+
+class AudioPeakDecoderTestCase(unittest.TestCase):
+
+    def test_audio_peaks_anaylzed(self):
+        mp3_file_path = os.path.join(os.path.dirname(__file__), 'resources', "test_1.mp3")
+        with open(mp3_file_path, 'r') as f:
+            decoder = AudioPeakDecoder(f)
+            decoder.calc_normalized_peaks()
+
+        mp3_wavedata_file_path = os.path.join(
+            os.path.dirname(__file__), 'resources', "wavedata_test_1_mp3.json"
+        )
+        with open(mp3_wavedata_file_path, 'r') as f:
+            file_content = f.read()
+            json_content = json.loads(file_content)
+        self.assertEqual(decoder.peaks, json_content['data'])

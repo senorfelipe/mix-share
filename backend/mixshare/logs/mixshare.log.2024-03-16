@@ -1,0 +1,15 @@
+2024-03-16 14:00:13,358 [INFO] mixshare: User: "admin@example.org" requests login
+2024-03-16 14:00:13,525 [INFO] mixshare: User: "admin@example.org" successfully authenticated
+2024-03-16 14:20:17,384 [INFO] mixshare - User: "admin@example.org" requests login
+2024-03-16 14:20:17,550 [INFO] mixshare - User: "admin@example.org" successfully authenticated
+2024-03-16 14:22:51,287 [INFO] mixshare - User: "admin@example.org" requests login
+2024-03-16 14:22:51,447 [INFO] mixshare - User: "admin@example.org" successfully authenticated
+2024-03-16 14:25:58,386 [INFO] mixshare - User: "admin@example.org" requests login
+2024-03-16 14:25:58,560 [INFO] mixshare - User: "admin@example.org" successfully authenticated
+2024-03-16 14:29:46,063 [INFO] mixshare - User: "admin@example.org" requests login
+2024-03-16 14:29:46,233 [INFO] mixshare - User: "admin@example.org" successfully authenticated
+2024-03-16 14:31:41,047 [INFO] mixshare - User: "admin@example.org" requests login
+2024-03-16 14:31:41,216 [INFO] mixshare - User: "admin@example.org" successfully authenticated
+2024-03-16 14:31:46,592 [INFO] mixshare - User: "admin@example.org" logged out
+2024-03-16 19:51:42,649 [INFO] mixshare - User: "admin@example.org" requests login
+2024-03-16 19:51:42,801 [INFO] mixshare - User: "admin@example.org" successfully authenticated

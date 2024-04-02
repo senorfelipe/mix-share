@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
@@ -10,7 +11,10 @@ from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.viewsets import mixins, ModelViewSet, GenericViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
+
+logger = logging.getLogger('mixshare')
 
 
 class MixViewSet(ModelViewSet):
@@ -18,12 +22,15 @@ class MixViewSet(ModelViewSet):
     renderer_classes = [JSONRenderer, AudioMPEGRenderer]
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = MixSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOfMixOrRealOnly]
+    permission_classes = [
+        AllowAny,
+    ]
     lookup_url_kwarg = "mix_id"
 
     def create(self, request, *args, **kwargs):
         uploaded_file = request.FILES.get('file')
         errors = {}
+        logger.info(f'Create new mix with data {request.data}')
 
         try:
             audio_analyzer = service.AudioFileAnalyzer(uploaded_file)
@@ -36,7 +43,7 @@ class MixViewSet(ModelViewSet):
                 errors.update(serializer.errors)
         except service.AudioAnalysisExeption as e:
             errors.update({'audio_file': 'While processing the audio file an error occured.'})
-            # TODO: Add logging output
+            logger.error(f'Uploading mixfile failed: {str(e)}')
 
         return Response(data=errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -44,11 +51,11 @@ class MixViewSet(ModelViewSet):
         mix = get_object_or_404(Mix, id=self.kwargs['mix_id'])
         accept_header = request.headers.get('Accept', '')
 
-        if 'audio/mpeg' in accept_header:
-            return service.stream(request, mix.file.path)
-        else:
+        if 'application/json' in accept_header:
             serializer = self.get_serializer(mix)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
+        else:
+            return service.stream(request, mix.file.path)
 
 
 class CommentViewSet(

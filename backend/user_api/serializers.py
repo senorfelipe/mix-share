@@ -1,10 +1,24 @@
 from rest_framework import serializers
 from rest_framework.serializers import HyperlinkedIdentityField
 from django.contrib.auth import get_user_model
-
 from .models import UserProfile
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
+
 
 UserModel = get_user_model()
+
+
+# answer from github to use httponly-cookie for refresh token (https://github.com/jazzband/djangorestframework-simplejwt/issues/71#issuecomment-762927394)
+class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+    refresh = None
+
+    def validate(self, attrs):
+        attrs['refresh'] = self.context['request'].COOKIES.get('refresh_token')
+        if attrs['refresh']:
+            return super().validate(attrs)
+        else:
+            raise InvalidToken('No valid token found in cookie \'refresh_token\'')
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
